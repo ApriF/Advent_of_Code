@@ -2,11 +2,11 @@
 with open('day9.txt', 'r') as fichier:
     ligne = fichier.readlines()[0]
 
-ligne = '2333133121414131402'
+
 mat = []
 for i in range(len(ligne)):
     mat.append(ligne[i])
-print('a')
+
 def run(part, ligne, string):
     #j'ai len(ligne) = 19999
     reverse = ligne[::-1]
@@ -47,7 +47,6 @@ def run(part, ligne, string):
         
         n = len(ligne)
         for i in range(n):
-            print(i)
             if i%2 == 0:
                 if ligne[i] != '.':
                     for _ in range (int(ligne[i])):
