@@ -85,12 +85,21 @@ def solve():
     count = 0
     direction = 0
     cherche(stack, visite, count, direction)
-    print(visite)
     return visite[(endx, endy)]
 
 #print(solve())
 
-def cherche2(stack, visite, count, direction, pred):
+def chemin(x,y,endx,endy, direction):
+    print('a')
+    visite_temp = {}
+    stack = []
+    stack.append((y,x))
+    count = 0
+    cherche(stack, visite_temp, count, direction)
+    visite_temp[(endx, endy)]
+    return visite_temp[(endx, endy)]
+
+def cherche2(stack, visite, count, direction, pred, pred2, endy, endx):
 
     if len(stack) == 0:
         return visite
@@ -99,45 +108,46 @@ def cherche2(stack, visite, count, direction, pred):
         if (x,y) not in visite.keys():
             visite[(x,y)] = count
             pred[(y,x)] = [(y - directions[direction][0], x-directions[direction][1])]
+            pred2[(y,x)] = direction
             if matrice[y+directions[direction][0]][x+directions[direction][1]] == '.':
                 stack.append((y+directions[direction][0], x+directions[direction][1]))
-                cherche2(stack, visite, count + 1, direction, pred)
+                cherche2(stack, visite, count + 1, direction, pred, pred2, endy, endx)
             
             direction = (direction + 1)%4
             if matrice[y+directions[direction][0]][x+directions[direction][1]] == '.':
                 stack.append((y+directions[direction][0], x+directions[direction][1]))
-                cherche2(stack, visite, count + 1 + 1000, direction, pred)
+                cherche2(stack, visite, count + 1 + 1000, direction, pred, pred2, endy, endx)
                 
             direction = (direction + 1)%4
             direction = (direction + 1)%4
             if matrice[y+directions[direction][0]][x+directions[direction][1]] == '.':
                 stack.append((y+directions[direction][0], x+directions[direction][1]))
-                cherche2(stack, visite, count + 1 + 1000, direction, pred)
-        else: 
-            if (x,y) == (9,7):
-                print(count, visite[x,y])
-            if count < visite[(x,y)]:
-                visite[(x,y)] = count
-                pred[(y,x)] = [(y - directions[direction][0], x-directions[direction][1])]
-                if matrice[y+directions[direction][0]][x+directions[direction][1]] == '.':
-                    stack.append((y+directions[direction][0], x+directions[direction][1]))
-                    cherche2(stack, visite, count + 1, direction, pred)
-                
-                direction = (direction + 1)%4
-                if matrice[y+directions[direction][0]][x+directions[direction][1]] == '.':
-                    stack.append((y+directions[direction][0], x+directions[direction][1]))
-                    cherche2(stack, visite, count + 1 + 1000, direction, pred)
-                
-                direction = (direction + 1)%4
-                direction = (direction + 1)%4
-                if matrice[y+directions[direction][0]][x+directions[direction][1]] == '.':
-                    stack.append((y+directions[direction][0], x+directions[direction][1]))
-                    cherche2(stack, visite, count + 1 + 1000, direction, pred)
-                    
-            elif count == visite[(x,y)]:
+                cherche2(stack, visite, count + 1 + 1000, direction, pred, pred2, endy, endx)
+        else:
+            if (count == visite[(x,y)] + 1000 or count == visite[(x,y)] -1000) and  count + chemin(x,y,endx,endy,direction) == visite[(x,y)] + chemin(x,y,endx,endy,pred2[(y,x)]):
                 if (y - directions[direction][0], x-directions[direction][1]) not in pred[(y,x)] and matrice[(y - directions[direction][0], x-directions[direction][1])] == '.':
                     pred[(y,x)].append((y - directions[direction][0], x-directions[direction][1]))
-            cherche2(stack, visite, count, direction, pred)
+            elif count < visite[(x,y)]:
+                visite[(x,y)] = count
+                pred[(y,x)] = [(y - directions[direction][0], x-directions[direction][1])]
+                pred2[(y,x)] = direction
+                if matrice[y+directions[direction][0]][x+directions[direction][1]] == '.':
+                    stack.append((y+directions[direction][0], x+directions[direction][1]))
+                    cherche2(stack, visite, count + 1, direction, pred, pred2, endy, endx)
+                
+                direction = (direction + 1)%4
+                if matrice[y+directions[direction][0]][x+directions[direction][1]] == '.':
+                    stack.append((y+directions[direction][0], x+directions[direction][1]))
+                    cherche2(stack, visite, count + 1 + 1000, direction, pred, pred2, endy, endx)
+                
+                direction = (direction + 1)%4
+                direction = (direction + 1)%4
+                if matrice[y+directions[direction][0]][x+directions[direction][1]] == '.':
+                    stack.append((y+directions[direction][0], x+directions[direction][1]))
+                    cherche2(stack, visite, count + 1 + 1000, direction, pred,pred2, endy, endx)
+                    
+
+            cherche2(stack, visite, count, direction, pred, pred2, endy, endx)
 
 
 def retrouver_chemins(pred, y, x, starty, startx, liste, visites=None):
@@ -171,19 +181,20 @@ def solve2():
             if matrice[i][j] == 'E':
                 endx, endy = j,i
                 matrice[i][j] = '.'
-    print_grid(matrice)
     stack.append((starty, startx))
     count = 0
     direction = 0
-    cherche2(stack, visite, count, direction, pred)
-    print(pred)
-
-    liste = []
+    pred2 = {}
+    cherche2(stack, visite, count, direction, pred, pred2, endy, endx)
+    print_grid(matrice)
+    #print(visite)
+    #print(pred)
+    liste = [(endy,endx)]
     visités = set()
     retrouver_chemins(pred, endy, endx, starty, startx, liste, visités)
 
-    print("\nListe des sommets sur les chemins optimaux :")
-    print(liste)
-    return len(liste)
+    #print("\nListe des sommets sur les chemins optimaux :")
+    #print(liste)
+    return len(liste), visite[(endx, endy)]
 
 solve2()
